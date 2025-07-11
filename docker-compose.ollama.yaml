@@ -1,0 +1,26 @@
+services:
+  ollama:
+    image: ollama/ollama:0.9.5
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./.scripts/ollama-entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/entrypoint.sh"]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      retries: 5
+
+  rag-app:
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["/wait-for-phi3.sh", "python", "main.py"]
+    environment:
+      - OLLAMA_CLIENT_URL=http://ollama:11434
+
+volumes:
+  ollama_data:

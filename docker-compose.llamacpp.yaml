@@ -1,0 +1,5 @@
+services:
+  rag-app:
+    # No wait-for script, no ollama dependency
+    entrypoint: ["python", "main.py"]
+    # Optionally enforce llama model path, etc.

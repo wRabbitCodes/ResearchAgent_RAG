@@ -19,7 +19,7 @@ def create_app() -> FastAPI:
 app = create_app()
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def root():
     return """
 <html>

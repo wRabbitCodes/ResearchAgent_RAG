@@ -1,6 +1,21 @@
-.PHONY: dev setup-entrypoint prepare-dirs setup-wait-script stop logs test create clean
-dev: setup-entrypoint prepare-dirs setup-wait-script
-	docker compose up --build
+.PHONY: dev setup-ollama-entrypoint prepare-dirs setup-wait-script stop logs test create clean
+
+dev: setup-ollama-entrypoint prepare-dirs setup-wait-script check-backend
+
+check-backend:
+	@echo "🔍 Checking LLM_BACKEND from .env (defaults to OLLAMA_BACKEND)..."
+	@BACKEND=$$(grep -E '^LLM_BACKEND=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r' || echo "OLLAMA_BACKEND"); \
+	echo "📦 Using backend: $$BACKEND"; \
+	if [ "$$BACKEND" = "OLLAMA_BACKEND" ]; then \
+		docker compose -f docker-compose.base.yaml -f docker-compose.ollama.yaml up --build; \
+	elif [ "$$BACKEND" = "LLAMA_CPP_BACKEND" ]; then \
+		docker compose -f docker-compose.base.yaml -f docker-compose.llamacpp.yaml up --build; \
+	else \
+		echo "❌ Unknown backend: $$BACKEND. Use OLLAMA_BACKEND or LLAMA_CPP_BACKEND"; \
+		exit 1; \
+	fi
+
+
 
 prepare-dirs:
 	@echo "🛠️  Creating necessary data directories with correct permissions"
@@ -15,7 +30,7 @@ prepare-dirs:
 	done
 
 
-setup-entrypoint:
+setup-ollama-entrypoint:
 	@echo "🛠️  Setting up Ollama entrypoint scripts"
 	@mkdir -p .scripts
 	@echo '#!/bin/sh' > .scripts/ollama-entrypoint.sh
@@ -32,10 +47,13 @@ setup-wait-script:
 	@echo "🛠️  Setting up wait-for-phi3 script"
 	@mkdir -p .scripts
 	@echo '#!/bin/sh' > .scripts/wait-for-phi3.sh
+	@echo 'set -a' >> .scripts/wait-for-phi3.sh
+	@echo '[ -f .env ] && . .env' >> .scripts/wait-for-phi3.sh
+	@echo 'set +a' >> .scripts/wait-for-phi3.sh
 	@echo 'OLLAMA_HOST=$${OLLAMA_CLIENT_URL:-http://ollama:11434}' >> .scripts/wait-for-phi3.sh
 	@echo 'MODEL_NAME=$${OLLAMA_MODEL_NAME:-phi3}' >> .scripts/wait-for-phi3.sh
 	@echo 'echo "Waiting for Ollama model '\''$$MODEL_NAME'\'' to be ready..."' >> .scripts/wait-for-phi3.sh
-	@echo 'until curl -s "$$OLLAMA_HOST/api/models" | grep "$$MODEL_NAME" > /dev/null; do' >> .scripts/wait-for-phi3.sh
+	@echo 'until curl -s "$$OLLAMA_HOST/api/tags" | grep "$$MODEL_NAME" > /dev/null; do' >> .scripts/wait-for-phi3.sh
 	@echo '  echo "Model $$MODEL_NAME not available yet, waiting 5 seconds..."' >> .scripts/wait-for-phi3.sh
 	@echo '  sleep 5' >> .scripts/wait-for-phi3.sh
 	@echo 'done' >> .scripts/wait-for-phi3.sh

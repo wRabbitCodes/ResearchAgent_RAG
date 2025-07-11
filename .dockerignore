@@ -23,7 +23,7 @@ logs/
 models/
 chroma_store/
 sample_data/
-.env
+# .env
 
 # Ignore linter
 mypy.ini
