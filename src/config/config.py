@@ -30,7 +30,7 @@ class Config:
         self.max_memory_turns = int(os.getenv("MAX_MEMORY_TURNS", 5))
         self.llm_backend = os.getenv("LLM_BACKEND", str(ALLOWED_LLMS.OLLAMA_BACKEND.value))
         self.chromadb_name = os.getenv("CHROMADB_NAME", "documents")
-        self.ollama_client_url = os.getenv("OLLAMA_CLIENT_URL", "http://localhost:11434")
+        self.ollama_client_url = os.getenv("OLLAMA_CLIENT_URL", "http://ollama:11434")
         self.embedding_model = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2-onnx")
         self.max_token = int(os.getenv("MAX_TOKEN", 512))
         self.context_window = int(os.getenv("CONTEXT_WINDOW", 4096))

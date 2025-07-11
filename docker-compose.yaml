@@ -29,11 +29,13 @@ services:
       - ./sample_data:/app/sample_data
       - ./logs:/app/logs
       - ./models:/app/models        # Required for LLAMA_CPP_BACKEND
+      - ./.scripts/wait-for-phi3.sh:/wait-for-phi3.sh
     environment:
       - OLLAMA_CLIENT_URL=http://ollama:11434
       - HOST=0.0.0.0
       - PORT=8000
       - LLM_BACKEND=OLLAMA_BACKEND
+    entrypoint: ["/wait-for-phi3.sh", "python", "main.py"]
 
 volumes:
   ollama_data:
