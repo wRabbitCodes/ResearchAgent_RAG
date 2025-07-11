@@ -17,7 +17,6 @@ def setup_logger():
         )  # 5MB per file, keep 5 backups
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
-
         root_logger = logging.getLogger()
         root_logger.setLevel(logging.INFO)
         root_logger.addHandler(handler)
@@ -30,3 +29,5 @@ def setup_logger():
     root_logger.addHandler(console_handler)
 
     # Now any logger will send logs to rotating file and console
+
+    logging.getLogger("watchfiles.main").setLevel(logging.WARNING)

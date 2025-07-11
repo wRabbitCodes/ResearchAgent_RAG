@@ -1,6 +1,19 @@
-.PHONY: dev setup-entrypoint
-dev: setup-entrypoint
+.PHONY: dev setup-entrypoint prepare-dirs
+dev: setup-entrypoint prepare-dirs
 	docker compose up --build
+
+prepare-dirs:
+	@echo "🛠️  Creating necessary data directories with correct permissions"
+	@for dir in logs chroma_store models sample_data; do \
+		if [ ! -d $$dir ]; then \
+			echo "📁 Creating $$dir"; \
+			mkdir -p $$dir; \
+		else \
+			echo "✅ $$dir already exists"; \
+		fi; \
+		chmod -R 775 $$dir; \
+	done
+
 
 setup-entrypoint:
 	@echo "🛠️  Setting up Ollama entrypoint script"

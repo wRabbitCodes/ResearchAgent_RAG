@@ -2,11 +2,7 @@ from fastapi import FastAPI
 from src.api.routes import ask, ingest, metrics, file_io
 from fastapi.responses import FileResponse, HTMLResponse
 
-from src.utils.logger_config import setup_logger
-
-
 def create_app() -> FastAPI:
-    setup_logger()
     app = FastAPI(
         title="RA Assistant",
         version="1.0",
