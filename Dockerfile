@@ -1,11 +1,10 @@
 # -------- Stage 1: Build with all dev tools --------
-FROM python:3.13.5-slim as builder
+FROM python:3.13.5-slim AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
-# Install system deps required for building llama-cpp-python
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -15,7 +14,6 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt .
 
-# Install dependencies including llama-cpp-python (built here)
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
@@ -25,18 +23,22 @@ FROM python:3.13.5-slim
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
 
-# Create non-root user
-RUN adduser --disabled-password --gecos "" appuser
-USER appuser
+# Install libgomp1 required by llama_cpp native lib (OpenMP runtime)
+RUN apt-get update && apt-get install -y libgomp1 && rm -rf /var/lib/apt/lists/*
 
 # Copy installed Python packages from builder stage
 COPY --from=builder /usr/local /usr/local
 
-# Copy only the code (no build tools, no models)
-COPY --chown=appuser:appuser . .
+# Copy only the code (no build tools, no models) AS ROOT first
+COPY . .
 
-# Expose FastAPI port
+# Create non-root user and set ownership
+RUN adduser --disabled-password --gecos "" appuser && \
+    chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
 EXPOSE 8000
 
-# Run the app
-CMD ["python", "src/main.py"]
+CMD ["python", "main.py"]
