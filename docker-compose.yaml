@@ -1,0 +1,40 @@
+services:
+  ollama:
+    image: ollama/ollama:0.9.5
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    command: >
+      sh -c "
+        ollama pull phi3 &&
+        ollama serve --host 0.0.0.0 --port 11434
+      "
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/health"]
+      interval: 10s
+      retries: 5
+
+  rag-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rag-app
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chroma_store:/app/chroma_store
+      - ./sample_data:/app/sample_data
+      - ./logs:/app/logs
+      - ./models:/app/models        # Required for LLAMA_CPP_BACKEND
+    env_file:
+      - .env
+
+volumes:
+  ollama_data:

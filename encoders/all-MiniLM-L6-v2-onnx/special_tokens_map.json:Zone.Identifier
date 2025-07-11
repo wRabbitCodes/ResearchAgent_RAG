@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://huggingface.co/onnx-models/all-MiniLM-L6-v2-onnx/tree/main
+HostUrl=https://huggingface.co/api/resolve-cache/models/onnx-models/all-MiniLM-L6-v2-onnx/75251058ddd779e3a744f87fdf63fb39681aec16/special_tokens_map.json?download=true&etag=%229bbecc17cabbcbd3112c14d6982b51403b264bfa%22

@@ -1,0 +1,7 @@
+pytest
+pytest-cov
+pytest-asyncio
+httpx
+coverage
+black
+mypy

@@ -1,0 +1,29 @@
+# Don't ignore these!
+!requirements.txt
+
+# Python/IDE cache
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.vscode/
+.mypy_cache/
+.pytest_cache/
+
+# Git stuff
+.git
+.gitignore
+
+# Docker infra
+Dockerfile
+docker-compose.yaml
+
+# Mounted folders (excluded from image)
+logs/
+models/
+chroma_store/
+sample_data/
+.env
+
+# Ignore linter
+mypy.ini
