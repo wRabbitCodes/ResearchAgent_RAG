@@ -62,16 +62,9 @@ setup-wait-script:
 	@chmod +x .scripts/wait-for-phi3.sh
 
 stop:
-	@echo "Stopping running containers based on backend..."
-	@BACKEND=$$(grep -E '^LLM_BACKEND=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r' || echo "OLLAMA_BACKEND"); \
-	if [ "$$BACKEND" = "OLLAMA_BACKEND" ]; then \
-		docker compose -f docker-compose.base.yaml -f docker-compose.ollama.yaml down; \
-	elif [ "$$BACKEND" = "LLAMA_CPP_BACKEND" ]; then \
-		docker compose -f docker-compose.base.yaml -f docker-compose.llamacpp.yaml down; \
-	else \
-		echo "Unknown backend: $$BACKEND. Use OLLAMA_BACKEND or LLAMA_CPP_BACKEND"; \
-		exit 1; \
-	fi
+	@echo "Stopping all containers..."
+	docker compose -f docker-compose.base.yaml -f docker-compose.ollama.yaml down || true
+	docker compose -f docker-compose.base.yaml -f docker-compose.llamacpp.yaml down || true
 	@echo "Cleaning up entrypoint scripts"
 	@rm -rf .scripts
 
@@ -95,8 +88,10 @@ create:
 	docker save -o ra_agent_image.tar ra_agent-rag-app:latest
 
 clean:
-	docker compose down -v
+	@echo "Cleaning up containers, images, and volumes..."
+	docker compose -f docker-compose.base.yaml -f docker-compose.ollama.yaml down -v || true
+	docker compose -f docker-compose.base.yaml -f docker-compose.llamacpp.yaml down -v || true
 	docker image rm ra_agent-rag-app:latest || true
 	docker image prune -f
 	@echo "Cleaning up entrypoint scripts"
-	@rm -rf .scripts   
+	@rm -rf .scripts
