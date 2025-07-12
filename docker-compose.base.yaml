@@ -16,4 +16,5 @@ services:
       - HOST=0.0.0.0
       - PORT=8000
       - LLM_BACKEND=${LLM_BACKEND:-OLLAMA_BACKEND}
+      - OLLAMA_CLIENT_URL=http://host.docker.internal:11434
     command: ["python", "main.py"]
