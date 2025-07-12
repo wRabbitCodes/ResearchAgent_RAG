@@ -26,3 +26,4 @@ def test_websocket_stream(monkeypatch):
                 break
 
         assert "".join(tokens) == "Hello world!"
+
