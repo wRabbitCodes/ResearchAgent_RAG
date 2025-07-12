@@ -1,6 +1,10 @@
-from fastapi import FastAPI
+import logging
+from fastapi import FastAPI, Request
 from src.api.routes import ask, ingest, metrics, file_io
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+logger = logging.getLogger(__name__)
 
 
 def create_app() -> FastAPI:
@@ -10,6 +14,30 @@ def create_app() -> FastAPI:
         docs_url="/docs",
         openapi_url="/openapi.json",
     )
+
+    @app.exception_handler(Exception)
+    async def global_exception_handler(request: Request, exc: Exception):
+        # Log the full exception details
+        logger.error("[Error]: %s", exc, exc_info=True)
+
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Operation Failed"},
+        )
+
+    @app.exception_handler(StarletteHTTPException)
+    async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+        """
+        Handles HTTPException instances, including those raised by FastAPI itself
+        (e.g., for validation errors or 404 Not Found).
+        Returns a JSON response with the appropriate status code and detail.
+        """
+        logger.error("[Error]: %s", exc, exc_info=True)
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail},
+        )
+
     app.include_router(ask.router)
     app.include_router(ingest.router)
     app.include_router(metrics.router)
