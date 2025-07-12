@@ -3,7 +3,7 @@ A light weight memory-augmented RAG application **Research Assistant** built wit
 ## Features 
 - :white_check_mark: Switchable LLM Backends (**Ollama** / **Llama CPP**) via. **.env** configurations.
 - :white_check_mark: Tool calling support. (Currently implemented **Wikipedia** search.)
-- :white_check_mark: Streaming response supports via. *websockets*
+- :white_check_mark: Streaming response supported via. *websockets*
 
   <details><summary><strong>See how to test streaming response!</strong></summary> 
     <code> After the application runs successfully, just open `socket_tester.html` from the root directory! </code>
@@ -469,7 +469,7 @@ The app is effectively issue free when running locally but there are some issues
   Ollama can take several seconds to load and initialize on startup specially with large models. Also, newly formed containers suffer from cold-start issue causeing first request from our app to take significant delay.
 
 - **Timeouts and Slow Responses in Containerized Setup**  
-  Communication between the RAG app and Ollama inside Docker containers is slower compared to calling a locally installed Ollama server. This can cause frequent request timeouts with 30-second limits.
+  Communication between the RAG app and Ollama inside Docker containers is slower compared to calling a locally installed Ollama server.
 
 - **Memory Constraints on Low-RAM Systems**  
   Even though our app runs on managable memory, running Ollama with larger models requires significant RAM (≥5-6 GB). **Phi3** model uses ~2.6GB. Systems with less memory (e.g., 4 GB) may fail to start Ollama properly or run into out-of-memory errors.
