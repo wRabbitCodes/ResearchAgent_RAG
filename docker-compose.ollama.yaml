@@ -18,6 +18,8 @@ services:
     depends_on:
       ollama:
         condition: service_healthy
+    volumes:
+      - ./.scripts/wait-for-phi3.sh:/wait-for-phi3.sh
     entrypoint: ["/wait-for-phi3.sh", "python", "main.py"]
     environment:
       - OLLAMA_CLIENT_URL=http://ollama:11434
