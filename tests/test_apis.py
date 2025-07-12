@@ -13,7 +13,7 @@ client = TestClient(app)
 def test_ask_endpoint_success(monkeypatch):
     # Mocking the RAG agent
 
-    def mock_answer_question(_):
+    def mock_answer_question(_, __):
         return {"answer": "Mocked answer", "sources": [{"source": "file1.txt"}]}
 
     monkeypatch.setattr(rag_agent, "answer_question", mock_answer_question)

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, WebSocket
 from src.api.schemas.ask import AskRequest, AskResponse
 from src.api.dependencies.services import rag_agent, llm
+from src.config.config import Config
 from src.utils.metrics import questions_total, latency_seconds, llm_failures_total
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -8,13 +9,15 @@ import time
 
 router = APIRouter()
 
+config = Config()
+
 
 @router.post("/ask", response_model=AskResponse)
 async def ask_endpoint(req: AskRequest):
     questions_total.inc()
     start = time.time()
     try:
-        result = rag_agent.answer_question(req.question)
+        result = rag_agent.answer_question(req.question, config.top_k_matches_vectordb)
         latency_seconds.observe(time.time() - start)
         return AskResponse(answer=result["answer"], sources=result["sources"])
     except Exception:

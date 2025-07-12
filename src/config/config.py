@@ -38,6 +38,7 @@ class Config:
         self.llama_cpp_gpu_layers = int(os.getenv("LLAMA_CPP_GPU_LAYERS", 0))
         self.request_timeout = int(os.getenv("REQUEST_TIMEOUT", 30))
         self.tooling_threshold = float(os.getenv("TOOLING_THRESHOLD", 0.3))
+        self.top_k_matches_vectordb = int(os.getenv("TOP_K_MATCHES_VECTORDB", 2))
 
         # Fixed paths
         self.chroma_db_path = os.path.join(self.ROOT_DIR, "chroma_store")
