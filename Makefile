@@ -1,6 +1,6 @@
-.PHONY: dev setup-ollama-entrypoint prepare-dirs setup-wait-script stop logs test create clean
+.PHONY: run run-with-container setup-ollama-entrypoint prepare-dirs setup-wait-script stop logs test create clean
 
-run-with-ollama: setup-ollama-entrypoint prepare-dirs setup-wait-script check-backend
+run-with-container: setup-ollama-entrypoint prepare-dirs setup-wait-script check-backend
 
 run: prepare-dirs
 	docker compose -f docker-compose.base.yaml up --build;
@@ -55,13 +55,15 @@ setup-wait-script:
 	@echo "Setting up wait-for-phi3 script"
 	@mkdir -p .scripts
 
-	@# Read values from .env or use default
-	@OLLAMA_HOST=$$(grep -E '^OLLAMA_CLIENT_URL=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r'); \
-	MODEL_NAME=$$(grep -E '^OLLAMA_MODEL_NAME=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r'); \
-	[ -z "$$OLLAMA_HOST" ] && OLLAMA_HOST="http://ollama:11434"; \
+	@# Try reading MODEL_NAME from .env, default to "phi3" if not found
+	@if [ -f .env ]; then \
+		MODEL_NAME=$$(grep -E '^OLLAMA_MODEL_NAME=' .env | cut -d '=' -f2 | tr -d '\r'); \
+	else \
+		MODEL_NAME=""; \
+	fi; \
 	[ -z "$$MODEL_NAME" ] && MODEL_NAME="phi3"; \
 	echo '#!/bin/sh' > .scripts/wait-for-phi3.sh; \
-	echo "OLLAMA_HOST=$$OLLAMA_HOST" >> .scripts/wait-for-phi3.sh; \
+	echo "OLLAMA_HOST=http://ollama:11434" >> .scripts/wait-for-phi3.sh; \
 	echo "MODEL_NAME=$$MODEL_NAME" >> .scripts/wait-for-phi3.sh; \
 	echo 'echo "Waiting for Ollama model '\''$$MODEL_NAME'\'' to be ready..."' >> .scripts/wait-for-phi3.sh; \
 	echo 'until curl -s "$$OLLAMA_HOST/api/tags" | grep "$$MODEL_NAME" > /dev/null; do' >> .scripts/wait-for-phi3.sh; \
@@ -72,6 +74,7 @@ setup-wait-script:
 	echo 'exec "$$@"' >> .scripts/wait-for-phi3.sh
 
 	@chmod +x .scripts/wait-for-phi3.sh
+
 
 
 stop:
