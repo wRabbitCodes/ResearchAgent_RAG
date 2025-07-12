@@ -75,6 +75,51 @@ A light weight memory-augmented RAG application **Research Assistant** built wit
   </details>
    
 - :white_check_mark: Ensured quality code with **mypy**, **ruff**/**pylint** and consistent formatting with **black**.
+---
+<br>
+
+## Table of Contents
+
+- [Features](#features)
+- [Running The App](#running-the-app)
+  - [Prerequisites](#prerequisites)
+  - [Using Makefiles commands](#using-makefiles-commands)
+  - [Running direct (Self Hosting)](#running-direct-self-hosting)
+- [Configurations](#configurations)
+- [System Architecture](#system-architecture)
+  - [System Diagram](#system-diagram)
+  - [System Description](#system-description)
+    - [Main](#main)
+    - [FastAPI App](#fastapi-app)
+    - [System](#system)
+    - [Retrieval-Augmented Generation (RAG) Agent](#retrieval-augmented-generation-rag-agent)
+      - [RAG Workflow diagram](#rag-workflow-diagram)
+      - [Overview](#overview)
+      - [Responsibilities](#responsibilities)
+      - [Why Custom RAG Agent?](#why-custom-rag-agent)
+      - [Future Potential](#future-potential)
+    - [MemoryBuffer](#memorybuffer)
+      - [Overview](#overview-1)
+      - [Features](#features-1)
+      - [Example Output](#example-output)
+    - [EmbeddingGenerator](#embeddinggenerator)
+      - [Overview](#overview-2)
+      - [Highlights](#highlights)
+      - [Why ONNX?](#why-onnx)
+    - [Vector DB Client](#vector-db-client)
+      - [Overview](#overview-3)
+      - [Responsibilities](#responsibilities-1)
+      - [Key Methods](#key-methods)
+      - [Future Ideas](#future-ideas)
+    - [LLMClient](#llmclient)
+      - [Overview](#overview-4)
+      - [OllamaClient](#ollamaclient)
+      - [LlamaCppClient](#llamacppclient)
+      - [Future Enhancements](#future-enhancements)
+- [Known Issues 🐞](#known-issues🐞)
+---
+<br>
+
 # Running The App 
 
 **Make** configurations are available for running the app in **Docker**.
@@ -417,11 +462,11 @@ LlamaCppClient wraps the native llama.cpp library (via llama-cpp-python) for ult
 
 - Add support for context persistence (e.g. KV cache reuse)
 
-# 🐞 Known Issues
+# Known Issues🐞
 The app is effectively issue free when running locally but there are some issues when running in containerized setups.
 
 - **Ollama Container Initialization Delay**  
-  Ollama can take several seconds to load and initialize large models on startup specially with large models. Also, newly formed containers suffer from cold-start issue causeing first request from our app to take significant delay.
+  Ollama can take several seconds to load and initialize on startup specially with large models. Also, newly formed containers suffer from cold-start issue causeing first request from our app to take significant delay.
 
 - **Timeouts and Slow Responses in Containerized Setup**  
   Communication between the RAG app and Ollama inside Docker containers is slower compared to calling a locally installed Ollama server. This can cause frequent request timeouts with 30-second limits.
