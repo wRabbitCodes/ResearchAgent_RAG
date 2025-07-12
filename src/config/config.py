@@ -34,7 +34,7 @@ class Config:
         self.embedding_model = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2-onnx")
         self.max_token = int(os.getenv("MAX_TOKEN", 512))
         self.context_window = int(os.getenv("CONTEXT_WINDOW", 4096))
-        self.use_tool = os.getenv("USE_TOOL", "false").lower() == "true"
+        self.use_tool = os.getenv("USE_TOOL", "true").lower() == "true"
         self.llama_cpp_gpu_layers = int(os.getenv("LLAMA_CPP_GPU_LAYERS", 0))
         self.request_timeout = int(os.getenv("REQUEST_TIMEOUT", 30))
         self.tooling_threshold = float(os.getenv("TOOLING_THRESHOLD", 0.3))
