@@ -18,7 +18,7 @@ check-backend:
 
 
 prepare-dirs:
-	@echo "🛠️  Creating necessary data directories with correct permissions"
+	@echo "Creating necessary data directories with correct permissions"
 	@for dir in logs chroma_store models sample_data; do \
 		if [ ! -d $$dir ]; then \
 			echo "Creating $$dir"; \
@@ -72,7 +72,7 @@ stop:
 		echo "Unknown backend: $$BACKEND. Use OLLAMA_BACKEND or LLAMA_CPP_BACKEND"; \
 		exit 1; \
 	fi
-	@echo "🧹 Cleaning up entrypoint scripts"
+	@echo "Cleaning up entrypoint scripts"
 	@rm -rf .scripts
 
 logs:
