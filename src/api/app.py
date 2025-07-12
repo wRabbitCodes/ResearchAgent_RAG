@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from src.api.routes import ask, ingest, metrics, file_io
 from fastapi.responses import FileResponse, HTMLResponse
 
+
 def create_app() -> FastAPI:
     app = FastAPI(
         title="RA Assistant",

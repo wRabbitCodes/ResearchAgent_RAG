@@ -3,15 +3,15 @@
 dev: setup-ollama-entrypoint prepare-dirs setup-wait-script check-backend
 
 check-backend:
-	@echo "🔍 Checking LLM_BACKEND from .env (defaults to OLLAMA_BACKEND)..."
+	@echo "Checking LLM_BACKEND from .env (defaults to OLLAMA_BACKEND)..."
 	@BACKEND=$$(grep -E '^LLM_BACKEND=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r' || echo "OLLAMA_BACKEND"); \
-	echo "📦 Using backend: $$BACKEND"; \
+	echo "Using backend: $$BACKEND"; \
 	if [ "$$BACKEND" = "OLLAMA_BACKEND" ]; then \
 		docker compose -f docker-compose.base.yaml -f docker-compose.ollama.yaml up --build; \
 	elif [ "$$BACKEND" = "LLAMA_CPP_BACKEND" ]; then \
 		docker compose -f docker-compose.base.yaml -f docker-compose.llamacpp.yaml up --build; \
 	else \
-		echo "❌ Unknown backend: $$BACKEND. Use OLLAMA_BACKEND or LLAMA_CPP_BACKEND"; \
+		echo "Unknown backend: $$BACKEND. Use OLLAMA_BACKEND or LLAMA_CPP_BACKEND"; \
 		exit 1; \
 	fi
 
@@ -21,17 +21,17 @@ prepare-dirs:
 	@echo "🛠️  Creating necessary data directories with correct permissions"
 	@for dir in logs chroma_store models sample_data; do \
 		if [ ! -d $$dir ]; then \
-			echo "📁 Creating $$dir"; \
+			echo "Creating $$dir"; \
 			mkdir -p $$dir; \
 		else \
-			echo "✅ $$dir already exists"; \
+			echo "$$dir already exists"; \
 		fi; \
 		chmod -R 775 $$dir; \
 	done
 
 
 setup-ollama-entrypoint:
-	@echo "🛠️  Setting up Ollama entrypoint scripts"
+	@echo "Setting up Ollama entrypoint scripts"
 	@mkdir -p .scripts
 	@echo '#!/bin/sh' > .scripts/ollama-entrypoint.sh
 	@echo 'ollama serve &' >> .scripts/ollama-entrypoint.sh
@@ -44,7 +44,7 @@ setup-ollama-entrypoint:
 	@chmod +x .scripts/ollama-entrypoint.sh
 
 setup-wait-script:
-	@echo "🛠️  Setting up wait-for-phi3 script"
+	@echo "Setting up wait-for-phi3 script"
 	@mkdir -p .scripts
 	@echo '#!/bin/sh' > .scripts/wait-for-phi3.sh
 	@echo 'set -a' >> .scripts/wait-for-phi3.sh

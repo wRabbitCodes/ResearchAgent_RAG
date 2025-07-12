@@ -4,6 +4,9 @@ from src.ingestion.document_ingestor import DocumentIngestor
 
 @pytest.mark.usefixtures("vectorstore", "dummy_folder")
 class TestDocumentIngestor:
+    """
+    Unit Test for Document Ingector
+    """
 
     @pytest.fixture(autouse=True)
     def setup(self, vectorstore):

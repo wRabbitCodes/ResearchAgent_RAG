@@ -34,7 +34,7 @@ class RAGAgent:
         results = self.vectorstore.query_by_vector(query_embedding, k=top_k)
 
         # Just to make MyPy feel safe SMH!!!
-        safe_first = lambda x: x[0] if isinstance(x, list) and len(x) > 0 else []  # noqa: E731
+        safe_first = lambda x: (x[0] if isinstance(x, list) and len(x) > 0 else [])  # noqa: E731
 
         documents = safe_first(results.get(self.config.chromadb_name))
         metadatas = safe_first(results.get("metadatas"))

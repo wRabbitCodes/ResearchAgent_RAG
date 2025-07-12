@@ -1,12 +1,17 @@
-import logging
-import requests
 import json
+import logging
+
+import requests
 
 from src.config.config import Config
 from src.llm.llm_client_base import LLMClientBase
 
 
 class OllamaClient(LLMClientBase):
+    """
+    Client wrapper for Ollama
+    """
+
     def __init__(self, model: str, base_url: str):
         self.model = model
         self.api_endpoint = f"{base_url.rstrip('/')}/api/generate"

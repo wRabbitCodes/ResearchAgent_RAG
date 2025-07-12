@@ -4,7 +4,7 @@ from src.api.app import app
 
 def test_websocket_stream(monkeypatch):
     # --- Mock llm.generate to simulate streaming tokens ---
-    def mock_generate(prompt, stream_callback=None, **kwargs):
+    def mock_generate(_, stream_callback=None, **__):
         for token in ["Hello", " ", "world", "!"]:
             stream_callback(token)
 

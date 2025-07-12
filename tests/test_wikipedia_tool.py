@@ -1,4 +1,3 @@
-
 from src.agent.tools.wikipedia_search_tool import WikipediaSearchTool
 
 
@@ -6,7 +5,7 @@ class TestWikipediaTool:
     def setup_method(self):
         # Default language English
         self.tool = WikipediaSearchTool(lang="en")
-        
+
     def test_run_page_not_found(self):
         # Query nonsense to trigger PageError
         result = self.tool.run("asdkjasldkjalksjdlkajsd")
@@ -16,6 +15,7 @@ class TestWikipediaTool:
         # Monkeypatch wikipedia.page to raise a generic exception
         def mock_page(query):
             raise Exception("Unexpected error")
+
         monkeypatch.setattr("wikipedia.page", mock_page)
 
         result = self.tool.run("Python")

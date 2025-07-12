@@ -8,7 +8,10 @@ import numpy as np
 
 class VectorStoreClient:
     def __init__(
-        self, path: str, name: str, embedding_function: Optional[Callable[..., Any]] = None
+        self,
+        path: str,
+        name: str,
+        embedding_function: Optional[Callable[..., Any]] = None,
     ):
         self.path = path
         self.name = name
@@ -17,7 +20,8 @@ class VectorStoreClient:
 
         if embedding_function is not None:
             collection = self.client.get_or_create_collection(
-                name=name, embedding_function=cast(EmbeddingFunction, embedding_function)
+                name=name,
+                embedding_function=cast(EmbeddingFunction, embedding_function),
             )
         else:
             collection = self.client.get_or_create_collection(name=name)

@@ -15,13 +15,13 @@ def setup_logger():
         handler = RotatingFileHandler(
             log_file, maxBytes=5 * 1024 * 1024, backupCount=5
         )  # 5MB per file, keep 5 backups
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         handler.setFormatter(formatter)
         root_logger = logging.getLogger()
         root_logger.setLevel(logging.INFO)
         root_logger.addHandler(handler)
     except PermissionError as e:
-        logging.error(f"Failed to set up file logger: {e}")
+        logging.error("Failed to set up file logger: %s", e)
 
     # Optional: Also log to console for dev
     console_handler = logging.StreamHandler()

@@ -7,6 +7,10 @@ from src.llm.llm_client_base import LLMClientBase
 
 
 class LlamaCppClient(LLMClientBase):
+    """
+    Client wrapper for Llama CPP
+    """
+
     def __init__(self, model_path: str):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.config = Config()

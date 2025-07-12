@@ -3,15 +3,17 @@ import shutil
 import tempfile
 from fastapi.testclient import TestClient
 from src.api.app import app
+from src.api.dependencies.services import rag_agent
+from src.api.dependencies.services import config, vectorstore
+
 
 client = TestClient(app)
 
 
 def test_ask_endpoint_success(monkeypatch):
     # Mocking the RAG agent
-    from src.api.dependencies.services import rag_agent
 
-    def mock_answer_question(question):
+    def mock_answer_question(_):
         return {"answer": "Mocked answer", "sources": [{"source": "file1.txt"}]}
 
     monkeypatch.setattr(rag_agent, "answer_question", mock_answer_question)
@@ -35,7 +37,6 @@ def test_metrics_endpoint():
 
 
 def test_ingest_endpoint_invalid_path(monkeypatch):
-    from src.api.dependencies.services import config
 
     monkeypatch.setattr(config, "documents_folder", "nonexistent_folder")
 
@@ -45,7 +46,6 @@ def test_ingest_endpoint_invalid_path(monkeypatch):
 
 
 def test_ingest_endpoint_valid(monkeypatch):
-    from src.api.dependencies.services import config, vectorstore
 
     # Set test path
     monkeypatch.setattr(config, "documents_folder", "tests/test_data")
@@ -59,10 +59,10 @@ def test_ingest_endpoint_valid(monkeypatch):
 
     # Mock ingestor
     class MockIngestor:
-        def __init__(self, vectorstore):
+        def __init__(self, _):
             pass
 
-        def ingest(self, folder_path, overwrite_existing=False):
+        def ingest(self, _, __=False):
             return None
 
     monkeypatch.setattr("src.api.routes.ingest.DocumentIngestor", MockIngestor)
@@ -70,13 +70,13 @@ def test_ingest_endpoint_valid(monkeypatch):
     response = client.get("/ingest")
     assert response.status_code == 202
 
+
 def test_chroma_clear_success(monkeypatch):
-    from src.api.dependencies.services import config
 
     # Setup temp chroma directory with fake files
     temp_dir = tempfile.mkdtemp()
     dummy_file = os.path.join(temp_dir, "dummy.db")
-    with open(dummy_file, "w") as f:
+    with open(dummy_file, "w", encoding="UTF-8") as f:
         f.write("test")
 
     monkeypatch.setattr(config, "chroma_db_path", temp_dir)
@@ -90,7 +90,6 @@ def test_chroma_clear_success(monkeypatch):
 
 
 def test_chroma_clear_not_found(monkeypatch):
-    from src.api.dependencies.services import config
     monkeypatch.setattr(config, "chroma_db_path", "nonexistent/folder/123")
 
     response = client.delete("/chroma/clear")

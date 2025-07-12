@@ -10,15 +10,15 @@ client = TestClient(app)
 
 
 def setup_module(module):
-    module._original_doc_folder = config.documents_folder
-    module._temp_dir = tempfile.mkdtemp()
-    config.documents_folder = module._temp_dir
-    config.max_upload_files = 2  # Limit for test
+    module.original_doc_folder = config.documents_folder
+    module.temp_dir = tempfile.mkdtemp()
+    config.documents_folder = module.temp_dir
+    config.max_upload_files = 2
 
 
 def teardown_module(module):
-    config.documents_folder = module._original_doc_folder
-    shutil.rmtree(module._temp_dir)
+    config.documents_folder = module.original_doc_folder
+    shutil.rmtree(module.temp_dir)
 
 
 def test_upload_valid_txt_file():
@@ -43,7 +43,11 @@ def test_upload_invalid_extension():
 
 def test_upload_over_file_limit():
     for i in range(config.max_upload_files):
-        with open(os.path.join(config.documents_folder, f"dummy{i}.txt"), "w") as f:
+        with open(
+            os.path.join(config.documents_folder, f"dummy{i}.txt"),
+            "w",
+            encoding="UTF-8",
+        ) as f:
             f.write("dummy")
 
     files = {"file": ("overflow.txt", b"should fail", "text/plain")}
@@ -54,7 +58,7 @@ def test_upload_over_file_limit():
 
 
 def test_clear_uploaded_documents():
-    with open(os.path.join(config.documents_folder, "to_delete.txt"), "w") as f:
+    with open(os.path.join(config.documents_folder, "to_delete.txt"), "w", encoding="UTF-8") as f:
         f.write("delete me")
 
     response = client.delete("/upload/clear")
