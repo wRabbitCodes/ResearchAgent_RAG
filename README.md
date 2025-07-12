@@ -116,7 +116,7 @@ A light weight memory-augmented RAG application **Research Assistant** built wit
       - [OllamaClient](#ollamaclient)
       - [LlamaCppClient](#llamacppclient)
       - [Future Enhancements](#future-enhancements)
-- [Known Issues 🐞](#known-issues🐞)
+- [Known Issues 🐞](#known-issues)
 ---
 <br>
 
@@ -462,7 +462,7 @@ LlamaCppClient wraps the native llama.cpp library (via llama-cpp-python) for ult
 
 - Add support for context persistence (e.g. KV cache reuse)
 
-# Known Issues🐞
+# Known Issues 
 The app is effectively issue free when running locally but there are some issues when running in containerized setups.
 
 - **Ollama Container Initialization Delay**  
