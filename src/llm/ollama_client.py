@@ -36,7 +36,7 @@ class OllamaClient(LLMClientBase):
         try:
             if stream_callback:
                 full_response = []
-                with requests.post(self.api_endpoint, json=payload, stream=True, timeout=30) as r:
+                with requests.post(self.api_endpoint, json=payload, stream=True, timeout=300) as r:
                     r.raise_for_status()
                     for line in r.iter_lines():
                         if line:
@@ -50,7 +50,7 @@ class OllamaClient(LLMClientBase):
                                 continue  # skip malformed line
                 return "".join(full_response)
             else:
-                response = requests.post(self.api_endpoint, json=payload, timeout=30)
+                response = requests.post(self.api_endpoint, json=payload, timeout=300)
                 response.raise_for_status()
                 return response.json().get("response", "").strip()
 

@@ -30,15 +30,13 @@ async def upload_document(file: UploadFile = File(...)):
         logger.warning("File container is full. Max number of allowed uploads reached.")
         raise HTTPException(status_code=400, detail="Document folder is full.")
 
-    # Generate unique filename
-    unique_name = f"{uuid.uuid4().hex}.{ext}"
-    file_path = os.path.join(config.documents_folder, unique_name)
+    file_path = os.path.join(config.documents_folder, file.filename)
 
     # Save file
     with open(file_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
-    return {"status": "success", "filename": unique_name}
+    return {"status": "success", "filename": file.filename}
 
 
 @router.delete("/upload/clear")

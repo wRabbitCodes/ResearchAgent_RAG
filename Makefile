@@ -1,6 +1,9 @@
 .PHONY: dev setup-ollama-entrypoint prepare-dirs setup-wait-script stop logs test create clean
 
-dev: setup-ollama-entrypoint prepare-dirs setup-wait-script check-backend
+run-with-ollama: setup-ollama-entrypoint prepare-dirs setup-wait-script check-backend
+
+run: prepare-dirs
+	docker compose -f docker-compose.base.yaml up --build;
 
 check-backend:
 	@echo "Checking LLM_BACKEND from .env (defaults to OLLAMA_BACKEND)..."
@@ -13,11 +16,8 @@ check-backend:
 		docker compose -f docker-compose.base.yaml -f docker-compose.llamacpp.yaml up --build; \
 	else \
 		echo "Unknown backend: $$BACKEND. Use OLLAMA_BACKEND or LLAMA_CPP_BACKEND"; \
-		exit 1; \
 	fi
-
-
-
+	exit 1;
 
 prepare-dirs:
 	@echo "Creating necessary data directories with correct permissions"
@@ -33,7 +33,7 @@ prepare-dirs:
 
 
 setup-ollama-entrypoint:
-	@echo "Setting up Ollama entrypoint scripts"
+	@echo "Setting up Ollama entrypoint script with preload"
 	@mkdir -p .scripts
 	@echo '#!/bin/sh' > .scripts/ollama-entrypoint.sh
 	@echo 'ollama serve &' >> .scripts/ollama-entrypoint.sh
@@ -41,9 +41,15 @@ setup-ollama-entrypoint:
 	@echo '  echo "Waiting for Ollama server to respond..."' >> .scripts/ollama-entrypoint.sh
 	@echo '  sleep 1' >> .scripts/ollama-entrypoint.sh
 	@echo 'done' >> .scripts/ollama-entrypoint.sh
-	@echo 'ollama pull phi3' >> .scripts/ollama-entrypoint.sh
+	@echo 'MODEL_NAME=$${OLLAMA_MODEL_NAME:-phi3}' >> .scripts/ollama-entrypoint.sh
+	@echo 'echo "Pulling model: $$MODEL_NAME..."' >> .scripts/ollama-entrypoint.sh
+	@echo 'ollama pull "$$MODEL_NAME"' >> .scripts/ollama-entrypoint.sh
+	@echo 'echo "Warming up model $$MODEL_NAME..."' >> .scripts/ollama-entrypoint.sh
+	@echo 'ollama run "$$MODEL_NAME" "Hello" > /dev/null' >> .scripts/ollama-entrypoint.sh
+	@echo 'echo "Model $$MODEL_NAME is preloaded and ready."' >> .scripts/ollama-entrypoint.sh
 	@echo 'wait' >> .scripts/ollama-entrypoint.sh
 	@chmod +x .scripts/ollama-entrypoint.sh
+
 
 setup-wait-script:
 	@echo "Setting up wait-for-phi3 script"
@@ -91,14 +97,14 @@ test:
 	pytest --cov=src --cov-report=term-missing
 
 create:
-	docker build -t researchagent_rag-rag-app:latest .
-	docker save -o researchagent_rag-rag-app_image.tar researchagent_rag-rag-app:latest
+	docker build -t research_agent-rag-app:latest .
+	docker save -o research_agent_image.tar research_agent-rag-app:latest
 
 clean:
 	@echo "Cleaning up containers, images, and volumes..."
 	docker compose -f docker-compose.base.yaml -f docker-compose.ollama.yaml down -v || true
 	docker compose -f docker-compose.base.yaml -f docker-compose.llamacpp.yaml down -v || true
-	docker image rm researchagent_rag-rag-app:latest || true
+	docker image rm research_agent-rag-app:latest || true
 	docker image prune -f
 	@echo "Cleaning up entrypoint scripts"
 	@rm -rf .scripts
