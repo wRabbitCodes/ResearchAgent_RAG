@@ -46,19 +46,21 @@ setup-ollama-entrypoint:
 setup-wait-script:
 	@echo "Setting up wait-for-phi3 script"
 	@mkdir -p .scripts
-	@echo '#!/bin/sh' > .scripts/wait-for-phi3.sh
-	@echo 'set -a' >> .scripts/wait-for-phi3.sh
-	@echo '[ -f .env ] && . .env' >> .scripts/wait-for-phi3.sh
-	@echo 'set +a' >> .scripts/wait-for-phi3.sh
-	@echo 'OLLAMA_HOST=$${OLLAMA_CLIENT_URL:-http://ollama:11434}' >> .scripts/wait-for-phi3.sh
-	@echo 'MODEL_NAME=$${OLLAMA_MODEL_NAME:-phi3}' >> .scripts/wait-for-phi3.sh
-	@echo 'echo "Waiting for Ollama model '\''$$MODEL_NAME'\'' to be ready..."' >> .scripts/wait-for-phi3.sh
-	@echo 'until curl -s "$$OLLAMA_HOST/api/tags" | grep "$$MODEL_NAME" > /dev/null; do' >> .scripts/wait-for-phi3.sh
-	@echo '  echo "Model $$MODEL_NAME not available yet, waiting 5 seconds..."' >> .scripts/wait-for-phi3.sh
-	@echo '  sleep 5' >> .scripts/wait-for-phi3.sh
-	@echo 'done' >> .scripts/wait-for-phi3.sh
-	@echo 'echo "Model $$MODEL_NAME is ready! Starting rag-app..."' >> .scripts/wait-for-phi3.sh
-	@echo 'exec "$$@"' >> .scripts/wait-for-phi3.sh
+
+	@# Read values from .env or fall back to defaults
+	@OLLAMA_HOST=$$(grep -E '^OLLAMA_CLIENT_URL=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r' || echo "http://ollama:11434"); \
+	MODEL_NAME=$$(grep -E '^OLLAMA_MODEL_NAME=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r' || echo "phi3"); \
+	echo '#!/bin/sh' > .scripts/wait-for-phi3.sh; \
+	echo "OLLAMA_HOST=$$OLLAMA_HOST" >> .scripts/wait-for-phi3.sh; \
+	echo "MODEL_NAME=$$MODEL_NAME" >> .scripts/wait-for-phi3.sh; \
+	echo 'echo "Waiting for Ollama model '\''$$MODEL_NAME'\'' to be ready..."' >> .scripts/wait-for-phi3.sh; \
+	echo 'until curl -s "$$OLLAMA_HOST/api/tags" | grep "$$MODEL_NAME" > /dev/null; do' >> .scripts/wait-for-phi3.sh; \
+	echo '  echo "Model $$MODEL_NAME not available yet, waiting 5 seconds..."' >> .scripts/wait-for-phi3.sh; \
+	echo '  sleep 5' >> .scripts/wait-for-phi3.sh; \
+	echo 'done' >> .scripts/wait-for-phi3.sh; \
+	echo 'echo "Model $$MODEL_NAME is ready! Starting rag-app..."' >> .scripts/wait-for-phi3.sh; \
+	echo 'exec "$$@"' >> .scripts/wait-for-phi3.sh
+
 	@chmod +x .scripts/wait-for-phi3.sh
 
 stop:
