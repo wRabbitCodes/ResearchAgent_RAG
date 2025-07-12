@@ -170,7 +170,6 @@ make test
 ```sh
   cd ./htmlcov && python -m http-server 8002
 ```
-- Trigger 
 >[!CAUTION]
 >##### If you are using the *"run"*  command,  you need to ensure that app container can access the *OLLAMA* URL (if using Ollama backend) or supply a `.gguf` LLM model to the `/models` directory (if using Llama CPP backend). For linux systems, this can be done by creating *config.toml* and adding the following in *$HOME_DIR/.ollama/config.toml* #####
 ```toml
