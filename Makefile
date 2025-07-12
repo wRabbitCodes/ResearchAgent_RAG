@@ -91,14 +91,14 @@ test:
 	pytest --cov=src --cov-report=term-missing
 
 create:
-	docker build -t ra_agent-rag-app:latest .
-	docker save -o ra_agent_image.tar ra_agent-rag-app:latest
+	docker build -t researchagent_rag-rag-app:latest .
+	docker save -o researchagent_rag-rag-app_image.tar researchagent_rag-rag-app:latest
 
 clean:
 	@echo "Cleaning up containers, images, and volumes..."
 	docker compose -f docker-compose.base.yaml -f docker-compose.ollama.yaml down -v || true
 	docker compose -f docker-compose.base.yaml -f docker-compose.llamacpp.yaml down -v || true
-	docker image rm ra_agent-rag-app:latest || true
+	docker image rm researchagent_rag-rag-app:latest || true
 	docker image prune -f
 	@echo "Cleaning up entrypoint scripts"
 	@rm -rf .scripts
