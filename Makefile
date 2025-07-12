@@ -1,8 +1,8 @@
-.PHONY: run run-with-container setup-ollama-entrypoint prepare-dirs setup-wait-script stop logs test create clean
+.PHONY: dev dev-with-ollama-container setup-ollama-entrypoint prepare-dirs setup-wait-script stop logs test create clean
 
-run-with-container: setup-ollama-entrypoint prepare-dirs setup-wait-script check-backend
+dev-with-ollama-container: setup-ollama-entrypoint prepare-dirs setup-wait-script check-backend
 
-run: prepare-dirs
+dev: prepare-dirs
 	docker compose -f docker-compose.base.yaml up --build;
 
 check-backend:
@@ -97,7 +97,7 @@ logs:
 	fi
 
 test:
-	pytest --cov=src --cov-report=term-missing
+	pytest --cov=src --cov-report=html
 
 create:
 	docker build -t research_agent-rag-app:latest .
