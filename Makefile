@@ -54,7 +54,7 @@ setup-wait-script:
 	echo "OLLAMA_HOST=$$OLLAMA_HOST" >> .scripts/wait-for-phi3.sh; \
 	echo "MODEL_NAME=$$MODEL_NAME" >> .scripts/wait-for-phi3.sh; \
 	echo 'echo "Waiting for Ollama model '\''$$MODEL_NAME'\'' to be ready..."' >> .scripts/wait-for-phi3.sh; \
-	echo 'until curl -s "$$OLLAMA_HOST/api/tags" | grep "$$MODEL_NAME" > /dev/null; do' >> .scripts/wait-for-phi3.sh; \
+	echo 'until curl -s "$$OLLAMA_HOST/api/models" | grep "$$MODEL_NAME" > /dev/null; do' >> .scripts/wait-for-phi3.sh; \
 	echo '  echo "Model $$MODEL_NAME not available yet, waiting 5 seconds..."' >> .scripts/wait-for-phi3.sh; \
 	echo '  sleep 5' >> .scripts/wait-for-phi3.sh; \
 	echo 'done' >> .scripts/wait-for-phi3.sh; \
