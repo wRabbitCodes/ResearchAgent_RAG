@@ -4,7 +4,8 @@ dev: setup-ollama-entrypoint prepare-dirs setup-wait-script check-backend
 
 check-backend:
 	@echo "Checking LLM_BACKEND from .env (defaults to OLLAMA_BACKEND)..."
-	@BACKEND=$$(grep -E '^LLM_BACKEND=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r' || echo "OLLAMA_BACKEND"); \
+	@BACKEND=$$(grep -E '^LLM_BACKEND=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r'); \
+	[ -z "$$BACKEND" ] && BACKEND="OLLAMA_BACKEND"; \
 	echo "Using backend: $$BACKEND"; \
 	if [ "$$BACKEND" = "OLLAMA_BACKEND" ]; then \
 		docker compose -f docker-compose.base.yaml -f docker-compose.ollama.yaml up --build; \
@@ -14,6 +15,7 @@ check-backend:
 		echo "Unknown backend: $$BACKEND. Use OLLAMA_BACKEND or LLAMA_CPP_BACKEND"; \
 		exit 1; \
 	fi
+
 
 
 
@@ -47,9 +49,11 @@ setup-wait-script:
 	@echo "Setting up wait-for-phi3 script"
 	@mkdir -p .scripts
 
-	@# Read values from .env or fall back to defaults
-	@OLLAMA_HOST=$$(grep -E '^OLLAMA_CLIENT_URL=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r' || echo "http://ollama:11434"); \
-	MODEL_NAME=$$(grep -E '^OLLAMA_MODEL_NAME=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r' || echo "phi3"); \
+	@# Read values from .env or use default
+	@OLLAMA_HOST=$$(grep -E '^OLLAMA_CLIENT_URL=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r'); \
+	MODEL_NAME=$$(grep -E '^OLLAMA_MODEL_NAME=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r'); \
+	[ -z "$$OLLAMA_HOST" ] && OLLAMA_HOST="http://ollama:11434"; \
+	[ -z "$$MODEL_NAME" ] && MODEL_NAME="phi3"; \
 	echo '#!/bin/sh' > .scripts/wait-for-phi3.sh; \
 	echo "OLLAMA_HOST=$$OLLAMA_HOST" >> .scripts/wait-for-phi3.sh; \
 	echo "MODEL_NAME=$$MODEL_NAME" >> .scripts/wait-for-phi3.sh; \
@@ -62,6 +66,7 @@ setup-wait-script:
 	echo 'exec "$$@"' >> .scripts/wait-for-phi3.sh
 
 	@chmod +x .scripts/wait-for-phi3.sh
+
 
 stop:
 	@echo "Stopping all containers..."
