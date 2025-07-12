@@ -340,7 +340,7 @@ While  offer graph-based orchestration and plugin support:
 * :white_check_mark: Rapid proto-typing
 * :white_check_mark: Custom class-based architecture gives us full control and testability
 
-**Future Potential:**
+#### Future Potential
 
 * `LangGraph` can be integrated to define complex decision logic (e.g. even better control on when to use tools, multi-hop reasoning)
 * `LangChain` may be used to chain retrievers, summarizers, and rankers
