@@ -62,12 +62,30 @@ setup-wait-script:
 	@chmod +x .scripts/wait-for-phi3.sh
 
 stop:
-	docker compose down
-	@echo "Cleaning up entrypoint scripts"
-	@rm -rf .scripts  
+	@echo "Stopping running containers based on backend..."
+	@BACKEND=$$(grep -E '^LLM_BACKEND=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r' || echo "OLLAMA_BACKEND"); \
+	if [ "$$BACKEND" = "OLLAMA_BACKEND" ]; then \
+		docker compose -f docker-compose.base.yaml -f docker-compose.ollama.yaml down; \
+	elif [ "$$BACKEND" = "LLAMA_CPP_BACKEND" ]; then \
+		docker compose -f docker-compose.base.yaml -f docker-compose.llamacpp.yaml down; \
+	else \
+		echo "Unknown backend: $$BACKEND. Use OLLAMA_BACKEND or LLAMA_CPP_BACKEND"; \
+		exit 1; \
+	fi
+	@echo "🧹 Cleaning up entrypoint scripts"
+	@rm -rf .scripts
 
 logs:
-	docker compose logs -f
+	@echo "Streaming logs based on backend..."
+	@BACKEND=$$(grep -E '^LLM_BACKEND=' .env 2>/dev/null | cut -d '=' -f2 | tr -d '\r' || echo "OLLAMA_BACKEND"); \
+	if [ "$$BACKEND" = "OLLAMA_BACKEND" ]; then \
+		docker compose -f docker-compose.base.yaml -f docker-compose.ollama.yaml logs -f; \
+	elif [ "$$BACKEND" = "LLAMA_CPP_BACKEND" ]; then \
+		docker compose -f docker-compose.base.yaml -f docker-compose.llamacpp.yaml logs -f; \
+	else \
+		echo "Unknown backend: $$BACKEND. Use OLLAMA_BACKEND or LLAMA_CPP_BACKEND"; \
+		exit 1; \
+	fi
 
 test:
 	pytest --cov=src --cov-report=term-missing
